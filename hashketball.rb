@@ -152,18 +152,58 @@ def player_stats(name)
       next if team_attr != :players
       team_hash[team_attr].each do |player_hash|
         if name == player_hash[:player_name]
-          return player_hash.collect do |stat, val|
-            
-          end
+          player_hash.delete(:player_name)
+          return player_hash
         end
       end
     end
   end
 end
 
+def big_shoe_rebounds
+  players = []
+  game_hash.each do |location, team_hash|
+    players << team_hash[:players]
+    players.flatten!
+  end
+  players.sort_by {|p| p[:shoe] }.reverse.first[:rebounds]
+end
 
+def most_points_scored
+  players = []
+  game_hash.each do |location, team_hash|
+    players << team_hash[:players]
+    players.flatten!
+  end
+  players.sort_by {|p| p[:points] }.reverse.first[:player_name]
+end
 
+def winning_team
+  teams = []
+  game_hash.each do |location, team_hash|
+    points = 0
+    team_hash[:players].each do |player_hash|
+      points += player_hash[:points]
+    end
+    teams << {name: team_hash[:team_name], points: points}
+  end
+  teams.sort_by {|p| p[:points] }.reverse.first[:name]
+end
 
+def player_with_longest_name
+  players = [] 
+  game_hash.each do |location, team_hash|
+    team_hash[:players].each {|p| players << p[:player_name]}
+  end
+  players.sort_by {|p| p.length}.reverse.first
+end
 
+def long_name_steals_a_ton?
+  players = []
+  game_hash.each do |location, team_hash|
+    players << team_hash[:players]
+    players.flatten!
+  end
+  player_with_longest_name == players.sort_by {|p| p[:steals] }.reverse.first[:player_name]
 
-
+end
